@@ -15,76 +15,8 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
-    <!-- CSS CORRIGIDO -->
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<!-- NAVBAR -->
-<nav class="navbar" id="navbar">
-    <div class="nav-container">
-        <div class="nav-brand">
-            <div class="brand-icon">
-                <i class="fas fa-satellite-dish"></i>
-            </div>
-            <div class="brand-text">
-                <span class="brand-name">RADAR PÚBLICO</span>
-                <span class="brand-tagline">Monitoramento Cívico Nacional</span>
-            </div>
-        </div>
-
-        <div class="nav-search">
-            <input type="text" placeholder="Buscar político, cidade, partido...">
-        </div>
-
-        <ul class="nav-links">
-            <li><a href="#">Início</a></li>
-            <li><a href="#">Legislativo</a></li>
-            <li><a href="#">Executivo</a></li>
-            <li><a href="#">STF</a></li>
-            <li><a href="#">Emendas</a></li>
-            <li><a href="#">Ranking</a></li>
-        </ul>
-    </div>
-</nav>
-
-<!-- CONTEÚDO -->
-<main id="mainContent">
-</main>
-
-<!-- FOOTER -->
-<footer>
-    <h3>RADAR PÚBLICO</h3>
-    <p>Transparência e controle social</p>
-</footer>
-
-<!-- JS CORRIGIDO -->
-<script src="data.js"></script>
-<script src="charts.js"></script>
-<script src="map.js"></script>
-<script src="pages.js"></script>
-<script src="main.js"></script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RADAR PÚBLICO - Quem está no poder. O que fez. Para onde foi o dinheiro.</title>
-    <meta name="description" content="Plataforma nacional de monitoramento de agentes públicos, emendas parlamentares e execução de recursos públicos.">
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-    
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
-    <!-- Main CSS -->
-    <link rel="stylesheet" href="style.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -125,7 +57,7 @@
             <li><a href="#" onclick="navigateTo('busca')" class="nav-link" data-page="busca"><i class="fas fa-search"></i> Busca</a></li>
         </ul>
 
-        <button class="nav-toggle" id="navToggle">
+        <button class="nav-toggle" id="navToggle" type="button">
             <span></span><span></span><span></span>
         </button>
     </div>
@@ -146,6 +78,7 @@
                 <p>Transparência e controle social</p>
             </div>
         </div>
+
         <div class="footer-links">
             <div class="footer-col">
                 <h4>Plataforma</h4>
@@ -167,12 +100,14 @@
                 <a href="#" onclick="navigateTo('fontes')">Fontes dos Dados</a>
             </div>
         </div>
+
         <div class="footer-info">
             <p><i class="fas fa-database"></i> Dados: Portal da Transparência, TSE, Câmara dos Deputados, Senado Federal</p>
             <p><i class="fas fa-sync-alt"></i> Última atualização: <span id="footerDate"></span></p>
             <p class="footer-disclaimer">Os dados exibidos são simulados para fins demonstrativos. A plataforma usa fontes públicas oficiais.</p>
         </div>
     </div>
+
     <div class="footer-bottom">
         <span>© 2025 RADAR PÚBLICO — Tecnologia Cívica para o Brasil</span>
         <span>Dados oficiais: transparencia.gov.br · camara.leg.br · senado.leg.br</span>
@@ -182,7 +117,7 @@
 <!-- Modal de Detalhes -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
     <div class="modal-content" id="modalContent" onclick="event.stopPropagation()">
-        <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+        <button class="modal-close" onclick="closeModal()" type="button"><i class="fas fa-times"></i></button>
         <div id="modalBody"></div>
     </div>
 </div>
