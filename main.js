@@ -38,6 +38,10 @@ function navigateTo(page, params = null) {
     renderPage(page, params);
 }
 
+    // Renderizar página
+    renderPage(page, params);
+}
+
 function renderPage(page, params) {
     const main = document.getElementById('mainContent');
     let html = '';
@@ -460,7 +464,6 @@ document.addEventListener('DOMContentLoaded', function() {
         showToast('👋 Bem-vindo ao RADAR PÚBLICO! Explore os dados de seus representantes.', 'info');
     }, 1500);
 });
-
 /* ============ HASH ROUTING (opcional) ============ */
 window.addEventListener('hashchange', function() {
     const hash = window.location.hash.slice(1);
