@@ -10,25 +10,16 @@ function renderHome() {
         <!-- Hero -->
         <section class="hero">
             <div class="hero-container">
-                <div class="hero-badge">
-                    <i class="fas fa-satellite-dish"></i>
-                    MONITORAMENTO NACIONAL EM TEMPO REAL
-                </div>
-                <h1 class="hero-title">
-                    Quem está no poder.<br>
-                    <span>O que fez. Para onde foi o dinheiro.</span>
-                </h1>
-                <p class="hero-subtitle">
-                    Plataforma nacional de transparência e controle social para monitorar políticos, 
-                    emendas parlamentares e execução de recursos públicos.
-                </p>
-                <div class="hero-questions">
-                    <span class="hero-tag">👤 Quem mandou o dinheiro?</span>
-                    <span class="hero-tag">🏙️ Para onde foi?</span>
-                    <span class="hero-tag">🏗️ Quem está executando?</span>
-                    <span class="hero-tag">📊 Qual o andamento?</span>
-                    <span class="hero-tag">⭐ Qual o desempenho?</span>
-                </div>
+                <span class="badge">📡 MONITORAMENTO EM TEMPO REAL</span>
+
+<h1 class="hero-title">
+    Quem está no poder.<br>
+    <span>O que fez. Para onde foi o dinheiro.</span>
+</h1>
+
+<p class="hero-subtitle">
+    Transparência real sobre políticos, emendas e execução de recursos públicos.
+</p>
 
                 <div class="hero-stats">
                     <div class="hero-stat" onclick="navigateTo('busca')">
