@@ -16,6 +16,12 @@ function navigateTo(page, params = null) {
     AppState.currentPage = page;
     AppState.currentParams = params;
     
+    // Atualizar hash da URL
+    const newHash = params ? `#${page}/${params}` : `#${page}`;
+    if (window.location.hash !== newHash) {
+        history.pushState(null, '', newHash);
+    }
+    
     // Atualizar links ativos na navbar
     document.querySelectorAll('.nav-link[data-page]').forEach(link => {
         link.classList.toggle('active', link.dataset.page === page);
@@ -25,7 +31,8 @@ function navigateTo(page, params = null) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
     // Fechar menu mobile
-    document.getElementById('navLinks').classList.remove('open');
+    const navLinks = document.getElementById('navLinks');
+    if (navLinks) navLinks.classList.remove('open');
 
     // Renderizar página
     renderPage(page, params);
@@ -439,8 +446,14 @@ document.addEventListener('DOMContentLoaded', function() {
     initBrandClick();
     updateFooterDate();
 
-    // Renderizar página inicial
-    navigateTo('home');
+    // Carregar página pela hash, se existir
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+        const [page, params] = hash.split('/');
+        navigateTo(page || 'home', params || null);
+    } else {
+        navigateTo('home');
+    }
 
     // Toast de boas-vindas
     setTimeout(() => {
