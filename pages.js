@@ -21,16 +21,7 @@
                     <span class="hero-tag">⭐ Qual o desempenho?</span>
                 </div>
                 <span class="badge">📡 MONITORAMENTO EM TEMPO REAL</span>
-
-<h1 class="hero-title">
-    Quem está no poder.<br>
-    <span>O que fez. Para onde foi o dinheiro.</span>
-</h1>
-
-<p class="hero-subtitle">
-    Transparência real sobre políticos, emendas e execução de recursos públicos.
-</p>
-
+                           
                   <div class="hero-stat" onclick="navigateTo('emendas')">
                        <div class="stat-num">${formatNumber(stats.total_emendas_2024)}</div>
                        <div class="stat-label">Emendas em 2024</div>
