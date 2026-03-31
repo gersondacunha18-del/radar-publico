@@ -5,21 +5,21 @@
 /* ============ HOME ============ */
 function renderHome() {
     const stats = RadarData.stats_gerais;
+
     return `
     <div class="page-transition">
-        <!-- Hero -->
         <section class="hero">
             <div class="hero-container">
                 <span class="badge">📡 MONITORAMENTO EM TEMPO REAL</span>
 
-<h1 class="hero-title">
-    Quem está no poder.<br>
-    <span>O que fez. Para onde foi o dinheiro.</span>
-</h1>
+                <h1 class="hero-title">
+                    Quem está no poder.<br>
+                    <span>O que fez. Para onde foi o dinheiro.</span>
+                </h1>
 
-<p class="hero-subtitle">
-    Transparência real sobre políticos, emendas e execução de recursos públicos.
-</p>
+                <p class="hero-subtitle">
+                    Transparência real sobre políticos, emendas e execução de recursos públicos.
+                </p>
 
                 <div class="hero-stats">
                     <div class="hero-stat" onclick="navigateTo('busca')">
@@ -62,39 +62,48 @@ function renderHome() {
             </div>
         </section>
 
-        <!-- Módulos -->
-        <section class="section" style="background:var(--primary-light)">
+        <section class="section">
             <div class="section-container">
                 <div class="section-header">
                     <div>
-                        <h2 class="section-title"><i class="fas fa-th-large"></i> Módulos da Plataforma</h2>
+                        <h2 class="section-title">
+                            <i class="fas fa-th-large"></i>
+                            Módulos da Plataforma
+                        </h2>
                         <p class="section-subtitle">Acesse os dados de cada poder e funcionalidade</p>
                     </div>
                 </div>
+
                 <div class="grid grid-4">
                     <div class="module-card" onclick="navigateTo('legislativo')">
                         <div class="module-icon blue"><i class="fas fa-landmark"></i></div>
                         <h3 class="module-title">Legislativo</h3>
                         <p class="module-count">Vereadores · Deputados · Senadores</p>
                     </div>
+
                     <div class="module-card" onclick="navigateTo('executivo')">
-                        <div class="module-icon green"><i class="fas fa-building-columns"></i></div>
+                        <div class="module-icon green"><i class="fas fa-building"></i></div>
                         <h3 class="module-title">Executivo</h3>
-                        <p class="module-count">Presidente · Governadores · Prefeitos</p>
+                        <p class="module-count">Prefeitos · Governadores · Ministros</p>
                     </div>
+
                     <div class="module-card" onclick="navigateTo('stf')">
                         <div class="module-icon purple"><i class="fas fa-gavel"></i></div>
                         <h3 class="module-title">Judiciário / STF</h3>
-                        <p class="module-count">Ministros · Sessões · Produtividade</p>
+                        <p class="module-count">Ministros · Sessões · Indicadores</p>
                     </div>
+
                     <div class="module-card" onclick="navigateTo('emendas')">
                         <div class="module-icon orange"><i class="fas fa-file-invoice-dollar"></i></div>
                         <h3 class="module-title">Emendas</h3>
-                        <p class="module-count">Rastreamento completo de recursos</p>
+                        <p class="module-count">Destino · Execução · Obras</p>
                     </div>
                 </div>
             </div>
         </section>
+    </div>
+    `;
+}
 
         <!-- Top Políticos -->
         <section class="section">
