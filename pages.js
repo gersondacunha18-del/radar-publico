@@ -31,12 +31,7 @@
     Transparência real sobre políticos, emendas e execução de recursos públicos.
 </p>
 
-               <div class="hero-stats">
-                   <div class="hero-stat" onclick="navigateTo('busca')">
-                       <div class="stat-num">${formatNumber(stats.total_politicos_monitorados)}</div>
-                       <div class="stat-label">Agentes Monitorados</div>
-                   </div>
-                   <div class="hero-stat" onclick="navigateTo('emendas')">
+                  <div class="hero-stat" onclick="navigateTo('emendas')">
                        <div class="stat-num">${formatNumber(stats.total_emendas_2024)}</div>
                        <div class="stat-label">Emendas em 2024</div>
                    </div>
