@@ -6,6 +6,10 @@
 function renderHome() {
     const stats = RadarData.stats_gerais;
 
+  /* ============ HOME ============ */
+function renderHome() {
+    const stats = RadarData.stats_gerais;
+
     return `
     <div class="page-transition">
         <section class="hero">
@@ -101,17 +105,13 @@ function renderHome() {
                 </div>
             </div>
         </section>
-    </div>
-    `;
-}
 
-        <!-- Top Políticos -->
         <section class="section">
             <div class="section-container">
                 <div class="section-header">
                     <div>
                         <h2 class="section-title"><i class="fas fa-users"></i> Políticos em Destaque</h2>
-                        <p class="section-subtitle">Maiores destaque por desempenho e volume de recursos</p>
+                        <p class="section-subtitle">Maiores destaques por desempenho e volume de recursos</p>
                     </div>
                     <button class="btn btn-outline btn-sm" onclick="navigateTo('busca')">Ver todos →</button>
                 </div>
@@ -121,7 +121,6 @@ function renderHome() {
             </div>
         </section>
 
-        <!-- Mapa -->
         <section class="section" style="background:var(--primary-light)">
             <div class="section-container">
                 <div class="section-header">
@@ -159,7 +158,6 @@ function renderHome() {
             </div>
         </section>
 
-        <!-- Gráficos de Execução -->
         <section class="section">
             <div class="section-container">
                 <div class="section-header">
@@ -191,7 +189,6 @@ function renderHome() {
             </div>
         </section>
 
-        <!-- Top Emendas Recentes -->
         <section class="section" style="background:var(--primary-light)">
             <div class="section-container">
                 <div class="section-header">
