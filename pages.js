@@ -20,7 +20,7 @@
                     <span class="hero-tag">📊 Qual o andamento?</span>
                     <span class="hero-tag">⭐ Qual o desempenho?</span>
                 </div>
-                <span class="badge">📡 MONITORAMENTO EM TEMPO REAL</span>
+                <div class="hero-stats">
                            
                   <div class="hero-stat" onclick="navigateTo('emendas')">
                        <div class="stat-num">${formatNumber(stats.total_emendas_2024)}</div>
@@ -57,6 +57,8 @@
                </div>
            </div>
        </section>
+     </div>
+                           
 
        <!-- Módulos -->
        <section class="section" style="background:var(--primary-light)">
