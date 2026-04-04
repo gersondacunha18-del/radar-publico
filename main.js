@@ -38,10 +38,6 @@ function navigateTo(page, params = null) {
     renderPage(page, params);
 }
 
-    // Renderizar página
-    renderPage(page, params);
-}
-
 function renderPage(page, params) {
     const main = document.getElementById('mainContent');
     let html = '';
