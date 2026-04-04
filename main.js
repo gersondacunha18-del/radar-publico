@@ -11,97 +11,181 @@ const AppState = {
     searchHistory: []
 };
 
-/* ============ ROTEADOR ============ */
-function navigateTo(page, params = null) {
-    AppState.currentPage = page;
-    AppState.currentParams = params;
-    
-    // Atualizar hash da URL
-    const newHash = params ? `#${page}/${params}` : `#${page}`;
-    if (window.location.hash !== newHash) {
-        history.pushState(null, '', newHash);
+/* ============ HELPERS ============ */
+function safeList(value) {
+    return Array.isArray(value) ? value : [];
+}
+
+function safeString(value) {
+    return String(value ?? '').trim();
+}
+
+function decodeParam(value) {
+    try {
+        return value ? decodeURIComponent(value) : null;
+    } catch {
+        return value || null;
     }
-    
-    // Atualizar links ativos na navbar
+}
+
+function encodeParam(value) {
+    return encodeURIComponent(String(value ?? ''));
+}
+
+/* ============ ROTEADOR ============ */
+function navigateTo(page, params = null, updateHash = true) {
+    const targetPage = safeString(page) || 'home';
+    const targetParams = params ?? null;
+
+    AppState.currentPage = targetPage;
+    AppState.currentParams = targetParams;
+
+    if (updateHash) {
+        const newHash = targetParams !== null && targetParams !== ''
+            ? `#${targetPage}/${encodeParam(targetParams)}`
+            : `#${targetPage}`;
+
+        if (window.location.hash !== newHash) {
+            history.pushState(null, '', newHash);
+        }
+    }
+
     document.querySelectorAll('.nav-link[data-page]').forEach(link => {
-        link.classList.toggle('active', link.dataset.page === page);
+        link.classList.toggle('active', link.dataset.page === targetPage);
     });
 
-    // Scroll ao topo
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // Fechar menu mobile
     const navLinks = document.getElementById('navLinks');
     if (navLinks) navLinks.classList.remove('open');
 
-    // Renderizar página
-    renderPage(page, params);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    renderPage(targetPage, targetParams);
 }
 
-function renderPage(page, params) {
+function renderPage(page, params = null) {
     const main = document.getElementById('mainContent');
+    if (!main) return;
+
     let html = '';
 
     switch (page) {
-        case 'home': html = renderHome(); break;
-        case 'busca': html = renderBusca(params || ''); break;
-        case 'perfil': html = renderPerfil(params || 1); break;
-        case 'legislativo': html = renderLegislativo(); break;
-        case 'executivo': html = renderExecutivo(); break;
-        case 'stf': html = renderSTF(); break;
-        case 'emendas': html = renderEmendas(params || ''); break;
-        case 'emenda-detalhe': html = renderEmendaDetalhe(params); break;
-        case 'ranking': html = renderRanking(); break;
-        case 'comparador': html = renderComparador(); break;
-        case 'metodologia': html = renderMetodologia(); break;
-        case 'fontes': html = renderFontes(); break;
-        default: html = renderHome(); break;
+        case 'home':
+            html = typeof renderHome === 'function' ? renderHome() : '<section class="section"><div class="section-container"><h2>Home</h2></div></section>';
+            break;
+
+        case 'busca':
+            html = typeof renderBusca === 'function' ? renderBusca(params || '') : '<section class="section"><div class="section-container"><h2>Busca</h2></div></section>';
+            break;
+
+        case 'perfil':
+            html = typeof renderPerfil === 'function' ? renderPerfil(params || 1) : '<section class="section"><div class="section-container"><h2>Perfil não disponível</h2></div></section>';
+            break;
+
+        case 'legislativo':
+            html = typeof renderLegislativo === 'function' ? renderLegislativo() : '<section class="section"><div class="section-container"><h2>Legislativo em preparação</h2></div></section>';
+            break;
+
+        case 'executivo':
+            html = typeof renderExecutivo === 'function' ? renderExecutivo() : '<section class="section"><div class="section-container"><h2>Executivo em preparação</h2></div></section>';
+            break;
+
+        case 'stf':
+            html = typeof renderSTF === 'function' ? renderSTF() : '<section class="section"><div class="section-container"><h2>STF em preparação</h2></div></section>';
+            break;
+
+        case 'emendas':
+            html = typeof renderEmendas === 'function' ? renderEmendas(params || '') : '<section class="section"><div class="section-container"><h2>Emendas em preparação</h2></div></section>';
+            break;
+
+        case 'emenda-detalhe':
+            html = typeof renderEmendaDetalhe === 'function' ? renderEmendaDetalhe(params) : '<section class="section"><div class="section-container"><h2>Detalhe da Emenda não disponível</h2></div></section>';
+            break;
+
+        case 'ranking':
+            html = typeof renderRanking === 'function' ? renderRanking() : '<section class="section"><div class="section-container"><h2>Ranking em preparação</h2></div></section>';
+            break;
+
+        case 'comparador':
+            html = typeof renderComparador === 'function' ? renderComparador() : '<section class="section"><div class="section-container"><h2>Comparador em preparação</h2></div></section>';
+            break;
+
+        case 'metodologia':
+            html = typeof renderMetodologia === 'function' ? renderMetodologia() : '<section class="section"><div class="section-container"><h2>Metodologia em preparação</h2></div></section>';
+            break;
+
+        case 'fontes':
+            html = typeof renderFontes === 'function' ? renderFontes() : '<section class="section"><div class="section-container"><h2>Fontes em preparação</h2></div></section>';
+            break;
+
+        default:
+            html = typeof renderHome === 'function' ? renderHome() : '<section class="section"><div class="section-container"><h2>Home</h2></div></section>';
+            break;
     }
 
     main.innerHTML = html;
 
-    // Inicializar recursos após renderização
     setTimeout(() => {
         initPageFeatures(page, params);
-    }, 100);
+    }, 80);
 }
 
 function initPageFeatures(page, params) {
-    // Mapa do Brasil (home)
     if (page === 'home') {
-        BrazilMap.render('brazilMap');
-        renderExecucaoGeralChart('chartExecucaoGeral');
-        renderRegiaoChart('chartRegiao');
-    }
+        if (typeof BrazilMap !== 'undefined' && BrazilMap && typeof BrazilMap.render === 'function') {
+            const mapEl = document.getElementById('brazilMap');
+            if (mapEl) BrazilMap.render('brazilMap');
+        }
 
-    // Perfil do político
-    if (page === 'perfil') {
-        const p = getPoliticoById(parseInt(params));
-        if (p) {
-            if (p.emendas_por_ano) renderEmendasAnoChart('chartEmendasAno', p.emendas_por_ano);
-            const areaData = p.recursos_por_area || p.orcamento_por_area;
-            if (areaData) renderAreaChart('chartArea', areaData);
-            if (p.presenca_por_mes) renderPresencaChart('chartPresenca', p.presenca_por_mes);
-            if (p.criterios_nota) renderNotaRadarChart('chartNota', p.criterios_nota);
-            if (p.tipo_cargo === 'executivo' && p.orcamento_total) renderOrcamentoChart('chartExecOrc', p);
-            
-            // Gráfico de score (canvas circular simples)
-            renderScoreCircle('profileScoreChart', p.nota);
+        if (typeof renderExecucaoGeralChart === 'function' && document.getElementById('chartExecucaoGeral')) {
+            renderExecucaoGeralChart('chartExecucaoGeral');
+        }
+
+        if (typeof renderRegiaoChart === 'function' && document.getElementById('chartRegiao')) {
+            renderRegiaoChart('chartRegiao');
         }
     }
 
-    // Painel Legislativo
-    if (page === 'legislativo') {
-        renderEvolucaoEmendasChart('chartEvolucaoEmendas');
-        renderTopEstadosChart('chartTopEstados');
+    if (page === 'perfil') {
+        const p = typeof getPoliticoById === 'function' ? getPoliticoById(parseInt(params)) : null;
+
+        if (p) {
+            if (p.emendas_por_ano && typeof renderEmendasAnoChart === 'function' && document.getElementById('chartEmendasAno')) {
+                renderEmendasAnoChart('chartEmendasAno', p.emendas_por_ano);
+            }
+
+            const areaData = p.recursos_por_area || p.orcamento_por_area;
+            if (areaData && typeof renderAreaChart === 'function' && document.getElementById('chartArea')) {
+                renderAreaChart('chartArea', areaData);
+            }
+
+            if (p.presenca_por_mes && typeof renderPresencaChart === 'function' && document.getElementById('chartPresenca')) {
+                renderPresencaChart('chartPresenca', p.presenca_por_mes);
+            }
+
+            if (p.criterios_nota && typeof renderNotaRadarChart === 'function' && document.getElementById('chartNota')) {
+                renderNotaRadarChart('chartNota', p.criterios_nota);
+            }
+
+            if (p.tipo_cargo === 'executivo' && p.orcamento_total && typeof renderOrcamentoChart === 'function' && document.getElementById('chartExecOrc')) {
+                renderOrcamentoChart('chartExecOrc', p);
+            }
+
+            renderScoreCircle('profileScoreChart', p.nota || 0);
+        }
     }
 
-    // Painel Executivo
+    if (page === 'legislativo') {
+        if (typeof renderEvolucaoEmendasChart === 'function' && document.getElementById('chartEvolucaoEmendas')) {
+            renderEvolucaoEmendasChart('chartEvolucaoEmendas');
+        }
+        if (typeof renderTopEstadosChart === 'function' && document.getElementById('chartTopEstados')) {
+            renderTopEstadosChart('chartTopEstados');
+        }
+    }
+
     if (page === 'executivo') {
-        // Simular gráfico de execução federal
         const ctx = document.getElementById('chartExecOrcFed');
-        if (ctx) {
-            const chart = new Chart(ctx, {
+        if (ctx && typeof Chart !== 'undefined') {
+            new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Executado', 'A Executar'],
@@ -113,7 +197,9 @@ function initPageFeatures(page, params) {
                     }]
                 },
                 options: {
-                    responsive: true, maintainAspectRatio: false, cutout: '70%',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
                     plugins: {
                         legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16 } },
                         tooltip: { callbacks: { label: (c) => ` ${c.raw}%` } }
@@ -123,26 +209,30 @@ function initPageFeatures(page, params) {
         }
     }
 
-    // STF
     if (page === 'stf') {
-        renderSTFProdutividadeChart('chartSTFProd');
-        renderSTFParticipacaoChart('chartSTFPart');
+        if (typeof renderSTFProdutividadeChart === 'function' && document.getElementById('chartSTFProd')) {
+            renderSTFProdutividadeChart('chartSTFProd');
+        }
+        if (typeof renderSTFParticipacaoChart === 'function' && document.getElementById('chartSTFPart')) {
+            renderSTFParticipacaoChart('chartSTFPart');
+        }
     }
 
-    // Detalhe de emenda
     if (page === 'emenda-detalhe') {
-        const emenda = getEmendaById(params);
-        if (emenda) renderEmendaExecucaoChart('chartEmendaExec', emenda);
+        const emenda = typeof getEmendaById === 'function' ? getEmendaById(params) : null;
+        if (emenda && typeof renderEmendaExecucaoChart === 'function' && document.getElementById('chartEmendaExec')) {
+            renderEmendaExecucaoChart('chartEmendaExec', emenda);
+        }
     }
 
-    // Comparador
     if (page === 'comparador') {
-        const p1 = getPoliticoById(1);
-        const p2 = getPoliticoById(2);
-        if (p1 && p2) renderComparadorChart('chartComparador', p1, p2);
+        const p1 = typeof getPoliticoById === 'function' ? getPoliticoById(1) : null;
+        const p2 = typeof getPoliticoById === 'function' ? getPoliticoById(2) : null;
+        if (p1 && p2 && typeof renderComparadorChart === 'function' && document.getElementById('chartComparador')) {
+            renderComparadorChart('chartComparador', p1, p2);
+        }
     }
 
-    // Inicializar funcionalidades gerais
     initScrollTop();
     updateFooterDate();
     animateNumbers();
@@ -152,22 +242,25 @@ function initPageFeatures(page, params) {
 function renderScoreCircle(canvasId, nota) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
+
     const ctx = canvas.getContext('2d');
-    const pct = nota / 10;
-    const cx = 50, cy = 50, r = 42;
+    const pct = Math.max(0, Math.min(1, Number(nota || 0) / 10));
+    const cx = 50;
+    const cy = 50;
+    const r = 42;
+
     ctx.clearRect(0, 0, 100, 100);
-    
-    // Fundo
+
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(255,255,255,0.05)';
     ctx.lineWidth = 8;
     ctx.stroke();
-    
-    // Progresso
+
     const gradient = ctx.createLinearGradient(0, 0, 100, 100);
     gradient.addColorStop(0, '#00d4ff');
     gradient.addColorStop(1, '#00ff9d');
+
     ctx.beginPath();
     ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * pct));
     ctx.strokeStyle = gradient;
@@ -180,79 +273,119 @@ function renderScoreCircle(canvasId, nota) {
 function switchTab(tabId) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    
+
     const targetContent = document.getElementById(tabId);
     if (targetContent) targetContent.classList.add('active');
-    
-    // Marcar botão ativo
+
     document.querySelectorAll('.tab-btn').forEach(btn => {
-        if (btn.getAttribute('onclick').includes(tabId)) {
-            btn.classList.add('active');
-        }
+        const clickAttr = btn.getAttribute('onclick') || '';
+        if (clickAttr.includes(tabId)) btn.classList.add('active');
     });
 
-    // Renderizar gráficos da aba, se necessário
-    const p = getPoliticoById(parseInt(AppState.currentParams));
-    if (tabId === 'perfil-presenca' && p && p.presenca_por_mes) {
+    const p = typeof getPoliticoById === 'function' ? getPoliticoById(parseInt(AppState.currentParams)) : null;
+
+    if (tabId === 'perfil-presenca' && p?.presenca_por_mes && typeof renderPresencaChart === 'function') {
         setTimeout(() => renderPresencaChart('chartPresenca', p.presenca_por_mes), 100);
     }
-    if (tabId === 'perfil-nota' && p && p.criterios_nota) {
+
+    if (tabId === 'perfil-nota' && p?.criterios_nota && typeof renderNotaRadarChart === 'function') {
         setTimeout(() => renderNotaRadarChart('chartNota', p.criterios_nota), 100);
     }
+
     if (tabId === 'perfil-visao' && p) {
-        if (p.emendas_por_ano) setTimeout(() => renderEmendasAnoChart('chartEmendasAno', p.emendas_por_ano), 100);
+        if (p.emendas_por_ano && typeof renderEmendasAnoChart === 'function') {
+            setTimeout(() => renderEmendasAnoChart('chartEmendasAno', p.emendas_por_ano), 100);
+        }
+
         const areaData = p.recursos_por_area || p.orcamento_por_area;
-        if (areaData) setTimeout(() => renderAreaChart('chartArea', areaData), 100);
-        if (p.tipo_cargo === 'executivo') setTimeout(() => renderOrcamentoChart('chartExecOrc', p), 100);
+        if (areaData && typeof renderAreaChart === 'function') {
+            setTimeout(() => renderAreaChart('chartArea', areaData), 100);
+        }
+
+        if (p.tipo_cargo === 'executivo' && typeof renderOrcamentoChart === 'function') {
+            setTimeout(() => renderOrcamentoChart('chartExecOrc', p), 100);
+        }
     }
 }
 
 /* ============ BUSCA GLOBAL ============ */
+function executeSearch(term) {
+    const value = safeString(term);
+
+    if (!value) {
+        navigateTo('busca');
+        return;
+    }
+
+    AppState.searchHistory.unshift(value);
+    AppState.searchHistory = AppState.searchHistory.slice(0, 8);
+
+    navigateTo('busca', value);
+}
+
 function initNavSearch() {
     const input = document.getElementById('navSearch');
     const dropdown = document.getElementById('searchDropdown');
+
     if (!input || !dropdown) return;
 
-    input.addEventListener('input', function() {
-        const q = this.value.trim().toLowerCase();
-        if (q.length < 2) { dropdown.classList.remove('active'); return; }
-        
-        const results = RadarData.politicos.filter(p =>
-            p.nome.toLowerCase().includes(q) ||
-            p.cargo.toLowerCase().includes(q) ||
-            p.partido.toLowerCase().includes(q) ||
-            p.uf.toLowerCase().includes(q)
+    input.addEventListener('input', function () {
+        const q = safeString(this.value).toLowerCase();
+
+        if (q.length < 2) {
+            dropdown.innerHTML = '';
+            dropdown.classList.remove('active');
+            return;
+        }
+
+        const results = safeList(RadarData.politicos).filter(p =>
+            String(p.nome || '').toLowerCase().includes(q) ||
+            String(p.cargo || '').toLowerCase().includes(q) ||
+            String(p.partido || '').toLowerCase().includes(q) ||
+            String(p.uf || '').toLowerCase().includes(q) ||
+            String(p.municipio || '').toLowerCase().includes(q)
         ).slice(0, 6);
 
-        if (results.length === 0) { dropdown.classList.remove('active'); return; }
+        if (results.length === 0) {
+            dropdown.innerHTML = `
+                <div class="search-result-item" style="justify-content:center" onclick="executeSearch('${q.replace(/'/g, "\\'")}')">
+                    <i class="fas fa-search" style="color:var(--accent)"></i>
+                    <span style="font-size:13px;color:var(--accent)">Buscar "${q}"</span>
+                </div>
+            `;
+            dropdown.classList.add('active');
+            return;
+        }
 
         dropdown.innerHTML = results.map(p => `
             <div class="search-result-item" onclick="navigateTo('perfil', '${p.id}'); document.getElementById('navSearch').value=''; document.getElementById('searchDropdown').classList.remove('active')">
-                <div class="result-avatar">${p.foto_inicial}</div>
+                <div class="result-avatar">${p.foto_inicial || '??'}</div>
                 <div class="result-info">
-                    <div class="result-name">${p.nome.split(' ').slice(0,3).join(' ')}</div>
-                    <div class="result-meta">${p.cargo} · ${p.partido} · ${p.uf}</div>
+                    <div class="result-name">${String(p.nome || '').split(' ').slice(0, 3).join(' ')}</div>
+                    <div class="result-meta">${p.cargo || '-'} · ${p.partido || '-'} · ${p.uf || '-'}</div>
                 </div>
                 <i class="fas fa-arrow-right" style="color:var(--accent);font-size:12px"></i>
             </div>
         `).join('') + `
-            <div class="search-result-item" style="justify-content:center" onclick="navigateTo('busca', '${q}'); document.getElementById('searchDropdown').classList.remove('active')">
+            <div class="search-result-item" style="justify-content:center" onclick="executeSearch('${q.replace(/'/g, "\\'")}'); document.getElementById('searchDropdown').classList.remove('active')">
                 <i class="fas fa-search" style="color:var(--accent)"></i>
                 <span style="font-size:13px;color:var(--accent)">Ver todos os resultados para "${q}"</span>
             </div>
         `;
+
         dropdown.classList.add('active');
     });
 
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (!input.contains(e.target) && !dropdown.contains(e.target)) {
             dropdown.classList.remove('active');
         }
     });
 
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && this.value.trim()) {
-            navigateTo('busca', this.value.trim());
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            executeSearch(this.value);
             dropdown.classList.remove('active');
             this.value = '';
         }
@@ -260,57 +393,75 @@ function initNavSearch() {
 }
 
 /* ============ BUSCA NA PÁGINA ============ */
-function handleBuscaInput(value) {
+function handleBuscaInput() {
     clearTimeout(window.buscaTimeout);
     window.buscaTimeout = setTimeout(() => {
         aplicarFiltros();
-    }, 300);
+    }, 250);
 }
 
 function aplicarFiltros() {
-    const texto = (document.getElementById('buscaInput')?.value || '').toLowerCase();
-    const cargo = document.getElementById('filtroCargo')?.value || '';
-    const partido = document.getElementById('filtroPartido')?.value || '';
-    const uf = document.getElementById('filtroUF')?.value || '';
-    const nota = document.getElementById('filtroNota')?.value || '';
+    const texto = safeString(document.getElementById('buscaInput')?.value).toLowerCase();
+    const cargo = safeString(document.getElementById('filtroCargo')?.value);
+    const partido = safeString(document.getElementById('filtroPartido')?.value);
+    const uf = safeString(document.getElementById('filtroUF')?.value);
+    const nota = safeString(document.getElementById('filtroNota')?.value);
 
-    let resultados = RadarData.politicos.filter(p => {
-        const matchTexto = !texto || p.nome.toLowerCase().includes(texto) || p.cargo.toLowerCase().includes(texto) || p.municipio.toLowerCase().includes(texto);
-        const matchCargo = !cargo || p.cargo.includes(cargo);
-        const matchPartido = !partido || p.partido === partido;
-        const matchUF = !uf || p.uf === uf;
-        const matchNota = !nota || p.nota_letra === nota;
+    const resultados = safeList(RadarData.politicos).filter(p => {
+        const matchTexto =
+            !texto ||
+            String(p.nome || '').toLowerCase().includes(texto) ||
+            String(p.cargo || '').toLowerCase().includes(texto) ||
+            String(p.partido || '').toLowerCase().includes(texto) ||
+            String(p.uf || '').toLowerCase().includes(texto) ||
+            String(p.municipio || '').toLowerCase().includes(texto);
+
+        const matchCargo = !cargo || String(p.cargo || '').includes(cargo);
+        const matchPartido = !partido || String(p.partido || '') === partido;
+        const matchUF = !uf || String(p.uf || '') === uf;
+        const matchNota = !nota || String(p.nota_letra || '') === nota;
+
         return matchTexto && matchCargo && matchPartido && matchUF && matchNota;
     });
 
     const container = document.getElementById('buscaResultados');
-    if (container) {
-        container.innerHTML = resultados.length > 0
-            ? resultados.map(p => renderPoliticoCard(p)).join('')
-            : `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-muted)">
+    if (!container) return;
+
+    if (resultados.length > 0) {
+        container.innerHTML = resultados.map(p => renderPoliticoCard(p)).join('');
+    } else {
+        container.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-muted)">
                 <i class="fas fa-search" style="font-size:48px;display:block;margin-bottom:16px;opacity:0.3"></i>
                 Nenhum resultado encontrado
-               </div>`;
+            </div>
+        `;
     }
 }
 
 /* ============ FILTRO DE EMENDAS ============ */
 function filtrarEmendas() {
-    const texto = (document.getElementById('filtroEmendasTexto')?.value || '').toLowerCase();
-    const uf = document.getElementById('filtroEmendasUF')?.value || '';
-    const situacao = document.getElementById('filtroEmendasSituacao')?.value || '';
-    const ano = document.getElementById('filtroEmendasAno')?.value || '';
+    const texto = safeString(document.getElementById('filtroEmendasTexto')?.value).toLowerCase();
+    const uf = safeString(document.getElementById('filtroEmendasUF')?.value);
+    const situacao = safeString(document.getElementById('filtroEmendasSituacao')?.value);
+    const ano = safeString(document.getElementById('filtroEmendasAno')?.value);
 
-    let emendas = RadarData.emendas.filter(e => {
-        const matchTexto = !texto || e.objeto.toLowerCase().includes(texto) || e.municipio.toLowerCase().includes(texto) || e.autor.toLowerCase().includes(texto);
-        const matchUF = !uf || e.estado === uf;
-        const matchSituacao = !situacao || e.situacao === situacao;
-        const matchAno = !ano || e.ano === parseInt(ano);
+    const emendas = safeList(RadarData.emendas).filter(e => {
+        const matchTexto =
+            !texto ||
+            String(e.objeto || '').toLowerCase().includes(texto) ||
+            String(e.municipio || '').toLowerCase().includes(texto) ||
+            String(e.autor || '').toLowerCase().includes(texto);
+
+        const matchUF = !uf || String(e.estado || '') === uf;
+        const matchSituacao = !situacao || String(e.situacao || '') === situacao;
+        const matchAno = !ano || Number(e.ano) === Number(ano);
+
         return matchTexto && matchUF && matchSituacao && matchAno;
     });
 
     const container = document.getElementById('emendasResultados');
-    if (container) {
+    if (container && typeof renderEmendasTabela === 'function') {
         container.innerHTML = renderEmendasTabela(emendas);
     }
 }
@@ -319,22 +470,33 @@ function filtrarEmendas() {
 function atualizarComparador() {
     const p1id = parseInt(document.getElementById('comparadorPol1')?.value);
     const p2id = parseInt(document.getElementById('comparadorPol2')?.value);
-    const p1 = getPoliticoById(p1id);
-    const p2 = getPoliticoById(p2id);
+
+    const p1 = typeof getPoliticoById === 'function' ? getPoliticoById(p1id) : null;
+    const p2 = typeof getPoliticoById === 'function' ? getPoliticoById(p2id) : null;
+
     if (!p1 || !p2) return;
 
     const grid = document.getElementById('compareGrid');
-    if (grid) {
-        grid.innerHTML = `${renderComparadorCard(p1, 'left')}<div class="compare-vs">VS</div>${renderComparadorCard(p2, 'right')}`;
+    if (grid && typeof renderComparadorCard === 'function') {
+        grid.innerHTML = `
+            ${renderComparadorCard(p1)}
+            <div class="compare-vs">VS</div>
+            ${renderComparadorCard(p2)}
+        `;
     }
-    setTimeout(() => renderComparadorChart('chartComparador', p1, p2), 100);
+
+    if (typeof renderComparadorChart === 'function') {
+        setTimeout(() => renderComparadorChart('chartComparador', p1, p2), 100);
+    }
 }
 
 /* ============ MODAL ============ */
 function openModal(title, content) {
     const overlay = document.getElementById('modalOverlay');
     const body = document.getElementById('modalBody');
+
     if (!overlay || !body) return;
+
     body.innerHTML = `<h2 style="font-size:20px;font-weight:800;margin-bottom:20px">${title}</h2>${content}`;
     overlay.classList.add('active');
 }
@@ -348,18 +510,36 @@ function closeModal() {
 function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
     if (!container) return;
-    const icons = { info: 'fa-info-circle', success: 'fa-check-circle', warning: 'fa-exclamation-circle' };
-    const colors = { info: 'var(--accent)', success: 'var(--success)', warning: 'var(--warning)' };
+
+    const icons = {
+        info: 'fa-info-circle',
+        success: 'fa-check-circle',
+        warning: 'fa-exclamation-circle'
+    };
+
+    const colors = {
+        info: 'var(--accent)',
+        success: 'var(--success)',
+        warning: 'var(--warning)'
+    };
+
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    toast.innerHTML = `<i class="fas ${icons[type]}" style="color:${colors[type]}"></i><span>${message}</span>`;
+    toast.innerHTML = `<i class="fas ${icons[type] || icons.info}" style="color:${colors[type] || colors.info}"></i><span>${message}</span>`;
+
     container.appendChild(toast);
-    setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(() => toast.remove(), 300); }, 3000);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
 /* ============ SCROLL TOP ============ */
 function initScrollTop() {
     let btn = document.querySelector('.scroll-top');
+
     if (!btn) {
         btn = document.createElement('button');
         btn.className = 'scroll-top';
@@ -367,20 +547,24 @@ function initScrollTop() {
         btn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
         document.body.appendChild(btn);
     }
-    
+
     const handleScroll = () => {
         btn.classList.toggle('visible', window.scrollY > 300);
     };
+
     window.removeEventListener('scroll', window._scrollHandler);
     window._scrollHandler = handleScroll;
     window.addEventListener('scroll', handleScroll);
+    handleScroll();
 }
 
 /* ============ MOBILE MENU ============ */
 function initMobileMenu() {
     const toggle = document.getElementById('navToggle');
     const links = document.getElementById('navLinks');
+
     if (!toggle || !links) return;
+
     toggle.addEventListener('click', () => {
         links.classList.toggle('open');
     });
@@ -399,16 +583,20 @@ function initNavbarScroll() {
 /* ============ FOOTER DATE ============ */
 function updateFooterDate() {
     const el = document.getElementById('footerDate');
-    if (el) el.textContent = RadarData.stats_gerais.data_atualizacao;
+    if (el && RadarData?.stats_gerais?.data_atualizacao) {
+        el.textContent = RadarData.stats_gerais.data_atualizacao;
+    }
 }
 
 /* ============ ANIMATE NUMBERS ============ */
 function animateNumbers() {
     const elements = document.querySelectorAll('.stat-num, .stat-card-value');
+
     elements.forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(10px)';
         el.style.transition = 'all 0.5s ease';
+
         setTimeout(() => {
             el.style.opacity = '1';
             el.style.transform = 'translateY(0)';
@@ -419,26 +607,28 @@ function animateNumbers() {
 /* ============ BRAND CLICK ============ */
 function initBrandClick() {
     const brand = document.querySelector('.nav-brand');
-    if (brand) brand.addEventListener('click', () => navigateTo('home'));
+    if (brand) {
+        brand.addEventListener('click', () => navigateTo('home'));
+    }
 }
 
 /* ============ KEYBOARD SHORTCUTS ============ */
 function initKeyboard() {
     document.addEventListener('keydown', (e) => {
-        // Ctrl+K para abrir busca
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
             const search = document.getElementById('navSearch');
             if (search) search.focus();
         }
-        // ESC para fechar modal
-        if (e.key === 'Escape') closeModal();
+
+        if (e.key === 'Escape') {
+            closeModal();
+        }
     });
 }
 
 /* ============ INICIALIZAÇÃO ============ */
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar componentes globais
+document.addEventListener('DOMContentLoaded', function () {
     initMobileMenu();
     initNavSearch();
     initNavbarScroll();
@@ -446,30 +636,38 @@ document.addEventListener('DOMContentLoaded', function() {
     initBrandClick();
     updateFooterDate();
 
-    // Carregar página pela hash, se existir
     const hash = window.location.hash.slice(1);
+
     if (hash) {
-        const [page, params] = hash.split('/');
-        navigateTo(page || 'home', params || null);
+        const [page, rawParams] = hash.split('/');
+        navigateTo(page || 'home', decodeParam(rawParams), false);
     } else {
-        navigateTo('home');
+        navigateTo('home', null, false);
+        history.replaceState(null, '', '#home');
     }
 
-    // Toast de boas-vindas
     setTimeout(() => {
         showToast('👋 Bem-vindo ao RADAR PÚBLICO! Explore os dados de seus representantes.', 'info');
-    }, 1500);
+    }, 1200);
 });
-/* ============ HASH ROUTING (opcional) ============ */
-window.addEventListener('hashchange', function() {
+
+/* ============ HASH ROUTING ============ */
+window.addEventListener('hashchange', function () {
     const hash = window.location.hash.slice(1);
-    if (hash) {
-        const [page, params] = hash.split('/');
-        navigateTo(page, params);
-    }
+    if (!hash) return;
+
+    const [page, rawParams] = hash.split('/');
+    navigateTo(page || 'home', decodeParam(rawParams), false);
 });
-// Expor funções globais para botões do HTML
+
+/* ============ EXPOR FUNÇÕES GLOBAIS ============ */
 window.navigateTo = navigateTo;
+window.executeSearch = executeSearch;
+window.handleBuscaInput = handleBuscaInput;
+window.aplicarFiltros = aplicarFiltros;
+window.filtrarEmendas = filtrarEmendas;
+window.atualizarComparador = atualizarComparador;
+window.switchTab = switchTab;
 window.closeModal = closeModal;
 window.openModal = openModal;
 window.showToast = showToast;
