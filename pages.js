@@ -1,10 +1,14 @@
 /* ============================================================
-   RADAR PÚBLICO — Módulo de Páginas (versão estável)
+   RADAR PÚBLICO — Módulo de Páginas (completo)
    ============================================================ */
 
 /* ============ HELPERS ============ */
 function safeArray(arr) {
     return Array.isArray(arr) ? arr : [];
+}
+
+function safeText(value, fallback = '-') {
+    return value !== undefined && value !== null && value !== '' ? value : fallback;
 }
 
 function getStatusBadge(status) {
@@ -17,21 +21,29 @@ function getStatusBadge(status) {
     return 'badge-gray';
 }
 
+function getPoliticoById(id) {
+    return safeArray(RadarData.politicos).find(p => String(p.id) === String(id)) || null;
+}
+
+function getEmendaById(id) {
+    return safeArray(RadarData.emendas).find(e => String(e.id) === String(id)) || null;
+}
+
 function renderPoliticoCard(p) {
     return `
     <div class="politician-card" onclick="navigateTo('perfil', '${p.id}')">
-        <div class="score-badge score-${(p.nota_letra || 'C').toLowerCase()}">${p.nota ?? '-'}</div>
-        <div class="politician-avatar">${p.foto_inicial || '??'}</div>
-        <div class="politician-name">${p.nome || 'Sem nome'}</div>
-        <div class="politician-role">${p.cargo || 'Cargo não informado'}</div>
-        <div class="politician-party">${p.partido || '-'} · ${p.uf || '-'}</div>
+        <div class="score-badge score-${(p.nota_letra || 'C').toLowerCase()}">${safeText(p.nota, '-')}</div>
+        <div class="politician-avatar">${safeText(p.foto_inicial, '??')}</div>
+        <div class="politician-name">${safeText(p.nome, 'Sem nome')}</div>
+        <div class="politician-role">${safeText(p.cargo, 'Cargo não informado')}</div>
+        <div class="politician-party">${safeText(p.partido, '-')} · ${safeText(p.uf, '-')}</div>
         <div class="politician-stats">
             <div class="pol-stat-item">
                 <div class="pol-stat-value">${p.valor_total ? formatCurrency(p.valor_total) : '-'}</div>
                 <div class="pol-stat-label">Recursos</div>
             </div>
             <div class="pol-stat-item">
-                <div class="pol-stat-value">${p.cidades_atendidas ?? '-'}</div>
+                <div class="pol-stat-value">${safeText(p.cidades_atendidas, '-')}</div>
                 <div class="pol-stat-label">Cidades</div>
             </div>
         </div>
@@ -42,30 +54,51 @@ function renderComparadorCard(p) {
     return `
     <div class="card">
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
-            <div class="politician-avatar" style="margin:0">${p.foto_inicial || '??'}</div>
+            <div class="politician-avatar" style="margin:0">${safeText(p.foto_inicial, '??')}</div>
             <div>
-                <div style="font-weight:800">${p.nome}</div>
-                <div style="font-size:12px;color:var(--text-muted)">${p.cargo} · ${p.partido} · ${p.uf}</div>
+                <div style="font-weight:800">${safeText(p.nome, 'Sem nome')}</div>
+                <div style="font-size:12px;color:var(--text-muted)">${safeText(p.cargo, '-')} · ${safeText(p.partido, '-')} · ${safeText(p.uf, '-')}</div>
             </div>
         </div>
         <div class="info-grid">
             <div class="info-item">
                 <div class="info-label">Nota</div>
-                <div class="info-value">${p.nota ?? '-'}</div>
+                <div class="info-value">${safeText(p.nota, '-')}</div>
             </div>
             <div class="info-item">
                 <div class="info-label">Presença</div>
-                <div class="info-value">${p.presenca ?? '-'}%</div>
+                <div class="info-value">${safeText(p.presenca, '-')}%</div>
             </div>
             <div class="info-item">
                 <div class="info-label">Projetos</div>
-                <div class="info-value">${p.projetos ?? '-'}</div>
+                <div class="info-value">${safeText(p.projetos, '-')}</div>
             </div>
             <div class="info-item">
                 <div class="info-label">Recursos</div>
                 <div class="info-value">${p.valor_total ? formatCurrency(p.valor_total) : '-'}</div>
             </div>
         </div>
+    </div>`;
+}
+
+function renderInfoGrid(items = []) {
+    return `
+    <div class="info-grid">
+        ${items.map(item => `
+            <div class="info-item">
+                <div class="info-label">${item.label}</div>
+                <div class="info-value">${item.value}</div>
+            </div>
+        `).join('')}
+    </div>`;
+}
+
+function renderEmptyState(title, subtitle = '') {
+    return `
+    <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-muted)">
+        <i class="fas fa-search" style="font-size:48px;display:block;margin-bottom:16px;opacity:0.3"></i>
+        <div style="font-size:18px;font-weight:700;margin-bottom:8px">${title}</div>
+        ${subtitle ? `<div>${subtitle}</div>` : ''}
     </div>`;
 }
 
@@ -285,27 +318,27 @@ function renderHome() {
                                 <tr onclick="navigateTo('emenda-detalhe', '${e.id}')" style="cursor:pointer">
                                     <td><span class="font-mono text-accent" style="font-size:11px">${e.id}</span></td>
                                     <td>
-                                        <div style="font-weight:600;font-size:13px">${e.autor.split(' ').slice(0,2).join(' ')}</div>
-                                        <div style="font-size:11px;color:var(--text-muted)">${e.partido} · ${e.uf}</div>
+                                        <div style="font-weight:600;font-size:13px">${safeText(e.autor, '').split(' ').slice(0,2).join(' ')}</div>
+                                        <div style="font-size:11px;color:var(--text-muted)">${safeText(e.partido, '-')} · ${safeText(e.uf, '-')}</div>
                                     </td>
                                     <td style="max-width:200px">
-                                        <div style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.objeto}</div>
-                                        <div style="font-size:11px;color:var(--text-muted)">${e.tipo}</div>
+                                        <div style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${safeText(e.objeto, '-')}</div>
+                                        <div style="font-size:11px;color:var(--text-muted)">${safeText(e.tipo, '-')}</div>
                                     </td>
-                                    <td><span class="font-mono" style="font-size:12px">${e.municipio} / ${e.estado}</span></td>
-                                    <td><span class="font-mono text-accent">${formatCurrency(e.valor_indicado)}</span></td>
-                                    <td><span class="font-mono text-accent2">${formatCurrency(e.valor_pago)}</span></td>
+                                    <td><span class="font-mono" style="font-size:12px">${safeText(e.municipio, '-')} / ${safeText(e.estado, '-')}</span></td>
+                                    <td><span class="font-mono text-accent">${e.valor_indicado ? formatCurrency(e.valor_indicado) : '-'}</span></td>
+                                    <td><span class="font-mono text-accent2">${e.valor_pago ? formatCurrency(e.valor_pago) : '-'}</span></td>
                                     <td>
                                         <span class="badge ${getStatusBadge(e.situacao)}">
-                                            <span class="status-dot ${e.situacao_cor}"></span>
-                                            ${e.situacao}
+                                            <span class="status-dot ${safeText(e.situacao_cor, '')}"></span>
+                                            ${safeText(e.situacao, '-')}
                                         </span>
                                     </td>
                                     <td>
                                         <div class="progress-bar" style="width:80px">
-                                            <div class="progress-fill ${e.percentual_execucao === 100 ? 'success' : e.percentual_execucao < 10 ? 'warning' : ''}" style="width:${e.percentual_execucao}%"></div>
+                                            <div class="progress-fill ${e.percentual_execucao === 100 ? 'success' : e.percentual_execucao < 10 ? 'warning' : ''}" style="width:${e.percentual_execucao || 0}%"></div>
                                         </div>
-                                        <span style="font-size:11px;color:var(--text-muted)">${e.percentual_execucao}%</span>
+                                        <span style="font-size:11px;color:var(--text-muted)">${safeText(e.percentual_execucao, 0)}%</span>
                                     </td>
                                 </tr>
                             `).join('')}
@@ -320,17 +353,18 @@ function renderHome() {
 
 /* ============ BUSCA ============ */
 function renderBusca(query = '') {
-    let resultados = RadarData.politicos;
+    let resultados = safeArray(RadarData.politicos);
     if (query) {
-        const q = query.toLowerCase();
-        resultados = RadarData.politicos.filter(p =>
-            p.nome.toLowerCase().includes(q) ||
-            p.cargo.toLowerCase().includes(q) ||
-            p.partido.toLowerCase().includes(q) ||
-            p.uf.toLowerCase().includes(q) ||
-            p.municipio.toLowerCase().includes(q)
+        const q = String(query).toLowerCase();
+        resultados = safeArray(RadarData.politicos).filter(p =>
+            String(p.nome || '').toLowerCase().includes(q) ||
+            String(p.cargo || '').toLowerCase().includes(q) ||
+            String(p.partido || '').toLowerCase().includes(q) ||
+            String(p.uf || '').toLowerCase().includes(q) ||
+            String(p.municipio || '').toLowerCase().includes(q)
         );
     }
+
     return `
     <div class="page-transition">
         <div class="page-hero">
@@ -340,13 +374,14 @@ function renderBusca(query = '') {
                 <p class="page-hero-subtitle">Pesquise por nome, cargo, partido, estado ou cidade</p>
             </div>
         </div>
+
         <section class="section">
             <div class="section-container">
                 <div class="filter-bar" style="flex-direction:column;align-items:stretch">
                     <div style="display:flex;gap:12px;flex-wrap:wrap">
                         <div style="flex:1;min-width:250px;position:relative">
                             <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px"></i>
-                            <input type="text" id="buscaInput" placeholder="Nome, cargo, partido, cidade..." 
+                            <input type="text" id="buscaInput" placeholder="Nome, cargo, partido, cidade..."
                                 style="width:100%;padding:10px 16px 10px 38px"
                                 value="${query}" oninput="handleBuscaInput(this.value)">
                         </div>
@@ -370,7 +405,7 @@ function renderBusca(query = '') {
                         </select>
                         <select id="filtroUF" onchange="aplicarFiltros()">
                             <option value="">Todos os Estados</option>
-                            ${RadarData.estados.slice(0,10).map(e => `<option value="${e.uf}">${e.nome}</option>`).join('')}
+                            ${safeArray(RadarData.estados).slice(0, 27).map(e => `<option value="${e.uf}">${e.nome}</option>`).join('')}
                         </select>
                         <select id="filtroNota" onchange="aplicarFiltros()">
                             <option value="">Todas as Notas</option>
@@ -382,7 +417,7 @@ function renderBusca(query = '') {
                 </div>
 
                 <div style="margin-bottom:16px;font-size:13px;color:var(--text-muted)">
-                    <i class="fas fa-info-circle text-accent"></i> 
+                    <i class="fas fa-info-circle text-accent"></i>
                     Exibindo <strong>${resultados.length}</strong> resultado${resultados.length !== 1 ? 's' : ''}
                     ${query ? ` para "<span style="color:var(--accent)">${query}</span>"` : ''}
                 </div>
@@ -390,13 +425,472 @@ function renderBusca(query = '') {
                 <div class="grid grid-4" id="buscaResultados">
                     ${resultados.length > 0
                         ? resultados.map(p => renderPoliticoCard(p)).join('')
-                        : `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-muted)">
-                            <i class="fas fa-search" style="font-size:48px;display:block;margin-bottom:16px;opacity:0.3"></i>
-                            Nenhum resultado encontrado para "<strong>${query}</strong>"
-                           </div>`
+                        : renderEmptyState(`Nenhum resultado encontrado para "${query}"`)
                     }
                 </div>
             </div>
         </section>
     </div>`;
+}
+
+/* ============ EMENDAS ============ */
+function renderEmendas() {
+    const emendas = safeArray(RadarData.emendas);
+    const stats = RadarData.stats_gerais || {};
+
+    return `
+    <div class="page-transition">
+        <div class="page-hero">
+            <div class="page-hero-container">
+                <div class="page-hero-label"><i class="fas fa-file-invoice-dollar"></i> EMENDAS</div>
+                <h1 class="page-hero-title">Rastreamento de Emendas Parlamentares</h1>
+                <p class="page-hero-subtitle">Acompanhe autor, destino, situação e execução dos recursos públicos</p>
+            </div>
+        </div>
+
+        <section class="section">
+            <div class="section-container">
+                ${renderInfoGrid([
+                    { label: 'Emendas em 2024', value: formatNumber(stats.total_emendas_2024 || emendas.length || 0) },
+                    { label: 'Valor Total', value: formatCurrency(stats.valor_total_emendas || 0) },
+                    { label: 'Taxa de Execução', value: `${stats.percentual_execucao || 0}%` },
+                    { label: 'Municípios Atendidos', value: formatNumber(stats.municipios_atendidos || 0) }
+                ])}
+
+                <div class="filter-bar" style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap">
+                    <input id="filtroEmendasTexto" type="text" placeholder="Buscar por autor, objeto ou município..." oninput="filtrarEmendas()" style="flex:1;min-width:240px">
+                    <select id="filtroEmendasUF" onchange="filtrarEmendas()">
+                        <option value="">Todos os Estados</option>
+                        ${safeArray(RadarData.estados).slice(0, 27).map(e => `<option value="${e.uf}">${e.uf}</option>`).join('')}
+                    </select>
+                    <select id="filtroEmendasSituacao" onchange="filtrarEmendas()">
+                        <option value="">Todas as Situações</option>
+                        ${[...new Set(emendas.map(e => e.situacao).filter(Boolean))].map(s => `<option value="${s}">${s}</option>`).join('')}
+                    </select>
+                    <select id="filtroEmendasAno" onchange="filtrarEmendas()">
+                        <option value="">Todos os Anos</option>
+                        ${[...new Set(emendas.map(e => e.ano).filter(Boolean))].sort((a,b) => b-a).map(a => `<option value="${a}">${a}</option>`).join('')}
+                    </select>
+                </div>
+
+                <div id="emendasResultados" class="table-wrapper" style="margin-top:20px">
+                    ${renderEmendasTabela(emendas)}
+                </div>
+            </div>
+        </section>
+    </div>`;
+}
+
+function renderEmendasTabela(emendas = []) {
+    if (!emendas.length) {
+        return renderEmptyState('Nenhuma emenda encontrada', 'Ajuste os filtros e tente novamente.');
+    }
+
+    return `
+    <table>
+        <thead>
+            <tr>
+                <th>CÓDIGO</th>
+                <th>AUTOR</th>
+                <th>OBJETO</th>
+                <th>MUNICÍPIO/UF</th>
+                <th>VALOR</th>
+                <th>PAGO</th>
+                <th>SITUAÇÃO</th>
+                <th>EXEC.</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${emendas.map(e => `
+                <tr onclick="navigateTo('emenda-detalhe', '${e.id}')" style="cursor:pointer">
+                    <td><span class="font-mono text-accent" style="font-size:11px">${e.id}</span></td>
+                    <td>
+                        <div style="font-weight:600;font-size:13px">${safeText(e.autor, '').split(' ').slice(0,2).join(' ')}</div>
+                        <div style="font-size:11px;color:var(--text-muted)">${safeText(e.partido, '-')} · ${safeText(e.uf, '-')}</div>
+                    </td>
+                    <td style="max-width:260px">
+                        <div style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${safeText(e.objeto, '-')}</div>
+                        <div style="font-size:11px;color:var(--text-muted)">${safeText(e.tipo, '-')}</div>
+                    </td>
+                    <td><span class="font-mono" style="font-size:12px">${safeText(e.municipio, '-')} / ${safeText(e.estado, '-')}</span></td>
+                    <td><span class="font-mono text-accent">${e.valor_indicado ? formatCurrency(e.valor_indicado) : '-'}</span></td>
+                    <td><span class="font-mono text-accent2">${e.valor_pago ? formatCurrency(e.valor_pago) : '-'}</span></td>
+                    <td>
+                        <span class="badge ${getStatusBadge(e.situacao)}">${safeText(e.situacao, '-')}</span>
+                    </td>
+                    <td>${safeText(e.percentual_execucao, 0)}%</td>
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>`;
+}
+
+/* ============ RANKING ============ */
+function renderRanking() {
+    const ranking = safeArray(RadarData.politicos)
+        .slice()
+        .sort((a, b) => Number(b.nota || 0) - Number(a.nota || 0));
+
+    return `
+    <div class="page-transition">
+        <div class="page-hero">
+            <div class="page-hero-container">
+                <div class="page-hero-label"><i class="fas fa-trophy"></i> RANKING</div>
+                <h1 class="page-hero-title">Ranking de Desempenho</h1>
+                <p class="page-hero-subtitle">Compare notas, presença, projetos e volume de recursos</p>
+            </div>
+        </div>
+
+        <section class="section">
+            <div class="section-container">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>NOME</th>
+                                <th>CARGO</th>
+                                <th>PARTIDO/UF</th>
+                                <th>NOTA</th>
+                                <th>PRESENÇA</th>
+                                <th>PROJETOS</th>
+                                <th>RECURSOS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${ranking.map((p, i) => `
+                                <tr onclick="navigateTo('perfil', '${p.id}')" style="cursor:pointer">
+                                    <td>${i + 1}</td>
+                                    <td><strong>${safeText(p.nome, '-')}</strong></td>
+                                    <td>${safeText(p.cargo, '-')}</td>
+                                    <td>${safeText(p.partido, '-')} · ${safeText(p.uf, '-')}</td>
+                                    <td>${safeText(p.nota, '-')}</td>
+                                    <td>${safeText(p.presenca, '-')}%</td>
+                                    <td>${safeText(p.projetos, '-')}</td>
+                                    <td>${p.valor_total ? formatCurrency(p.valor_total) : '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>`;
+}
+
+/* ============ COMPARADOR ============ */
+function renderComparador() {
+    const politicos = safeArray(RadarData.politicos);
+
+    return `
+    <div class="page-transition">
+        <div class="page-hero">
+            <div class="page-hero-container">
+                <div class="page-hero-label"><i class="fas fa-balance-scale"></i> COMPARADOR</div>
+                <h1 class="page-hero-title">Compare Agentes Públicos</h1>
+                <p class="page-hero-subtitle">Selecione dois nomes e veja os indicadores lado a lado</p>
+            </div>
+        </div>
+
+        <section class="section">
+            <div class="section-container">
+                <div class="filter-bar" style="display:flex;gap:12px;flex-wrap:wrap">
+                    <select id="comparadorPol1" onchange="atualizarComparador()" style="flex:1;min-width:240px">
+                        ${politicos.map((p, i) => `<option value="${p.id}" ${i === 0 ? 'selected' : ''}>${p.nome}</option>`).join('')}
+                    </select>
+                    <select id="comparadorPol2" onchange="atualizarComparador()" style="flex:1;min-width:240px">
+                        ${politicos.map((p, i) => `<option value="${p.id}" ${i === 1 ? 'selected' : ''}>${p.nome}</option>`).join('')}
+                    </select>
+                </div>
+
+                <div id="compareGrid" class="grid grid-2" style="margin-top:20px">
+                    ${politicos[0] ? renderComparadorCard(politicos[0]) : ''}
+                    ${politicos[1] ? renderComparadorCard(politicos[1]) : ''}
+                </div>
+
+                <div class="chart-container" style="margin-top:20px">
+                    <div class="chart-header">
+                        <span class="chart-title"><i class="fas fa-chart-radar"></i> Comparação Visual</span>
+                    </div>
+                    <div style="height:320px">
+                        <canvas id="chartComparador"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>`;
+}
+
+/* ============ PERFIL ============ */
+function renderPerfil(id) {
+    const p = getPoliticoById(id);
+    if (!p) {
+        return `
+        <section class="section">
+            <div class="section-container">
+                ${renderEmptyState('Político não encontrado')}
+            </div>
+        </section>`;
+    }
+
+    return `
+    <div class="page-transition">
+        <div class="page-hero">
+            <div class="page-hero-container">
+                <div class="page-hero-label"><i class="fas fa-user"></i> PERFIL</div>
+                <h1 class="page-hero-title">${safeText(p.nome, 'Sem nome')}</h1>
+                <p class="page-hero-subtitle">${safeText(p.cargo, '-')} · ${safeText(p.partido, '-')} · ${safeText(p.uf, '-')}</p>
+            </div>
+        </div>
+
+        <section class="section">
+            <div class="section-container">
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+                            <div class="politician-avatar" style="width:72px;height:72px;font-size:28px">${safeText(p.foto_inicial, '??')}</div>
+                            <div>
+                                <div style="font-size:24px;font-weight:800">${safeText(p.nome, 'Sem nome')}</div>
+                                <div style="color:var(--text-muted)">${safeText(p.cargo, '-')} · ${safeText(p.partido, '-')} · ${safeText(p.uf, '-')}</div>
+                            </div>
+                        </div>
+
+                        ${renderInfoGrid([
+                            { label: 'Nota', value: safeText(p.nota, '-') },
+                            { label: 'Presença', value: `${safeText(p.presenca, '-')}%` },
+                            { label: 'Projetos', value: safeText(p.projetos, '-') },
+                            { label: 'Cidades Atendidas', value: safeText(p.cidades_atendidas, '-') },
+                            { label: 'Município Base', value: safeText(p.municipio, '-') },
+                            { label: 'Recursos', value: p.valor_total ? formatCurrency(p.valor_total) : '-' }
+                        ])}
+                    </div>
+
+                    <div class="card">
+                        <div style="display:flex;justify-content:center;align-items:center;min-height:260px">
+                            <canvas id="profileScoreChart" width="100" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>`;
+}
+
+/* ============ DETALHE DA EMENDA ============ */
+function renderEmendaDetalhe(id) {
+    const e = getEmendaById(id);
+    if (!e) {
+        return `
+        <section class="section">
+            <div class="section-container">
+                ${renderEmptyState('Emenda não encontrada')}
+            </div>
+        </section>`;
+    }
+
+    return `
+    <div class="page-transition">
+        <div class="page-hero">
+            <div class="page-hero-container">
+                <div class="page-hero-label"><i class="fas fa-file-invoice-dollar"></i> DETALHE DA EMENDA</div>
+                <h1 class="page-hero-title">${safeText(e.objeto, 'Sem objeto')}</h1>
+                <p class="page-hero-subtitle">${safeText(e.autor, '-')} · ${safeText(e.municipio, '-')} / ${safeText(e.estado, '-')}</p>
+            </div>
+        </div>
+
+        <section class="section">
+            <div class="section-container">
+                ${renderInfoGrid([
+                    { label: 'Código', value: safeText(e.id, '-') },
+                    { label: 'Autor', value: safeText(e.autor, '-') },
+                    { label: 'Partido/UF', value: `${safeText(e.partido, '-')} · ${safeText(e.uf, '-')}` },
+                    { label: 'Tipo', value: safeText(e.tipo, '-') },
+                    { label: 'Situação', value: safeText(e.situacao, '-') },
+                    { label: 'Ano', value: safeText(e.ano, '-') },
+                    { label: 'Valor Indicado', value: e.valor_indicado ? formatCurrency(e.valor_indicado) : '-' },
+                    { label: 'Valor Pago', value: e.valor_pago ? formatCurrency(e.valor_pago) : '-' },
+                    { label: 'Execução', value: `${safeText(e.percentual_execucao, 0)}%` }
+                ])}
+
+                <div class="chart-container" style="margin-top:20px">
+                    <div class="chart-header">
+                        <span class="chart-title"><i class="fas fa-chart-pie"></i> Execução da Emenda</span>
+                    </div>
+                    <div style="height:320px">
+                        <canvas id="chartEmendaExec"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>`;
+}
+
+/* ============ LEGISLATIVO ============ */
+function renderLegislativo() {
+    const lista = safeArray(RadarData.politicos).filter(p =>
+        String(p.cargo || '').toLowerCase().includes('deput') ||
+        String(p.cargo || '').toLowerCase().includes('senador') ||
+        String(p.cargo || '').toLowerCase().includes('vereador')
+    );
+
+    return `
+    <div class="page-transition">
+        <div class="page-hero">
+            <div class="page-hero-container">
+                <div class="page-hero-label"><i class="fas fa-landmark"></i> LEGISLATIVO</div>
+                <h1 class="page-hero-title">Painel do Legislativo</h1>
+                <p class="page-hero-subtitle">Vereadores, deputados e senadores monitorados</p>
+            </div>
+        </div>
+
+        <section class="section">
+            <div class="section-container">
+                <div class="grid grid-4">
+                    ${lista.length ? lista.map(p => renderPoliticoCard(p)).join('') : renderEmptyState('Nenhum registro do Legislativo')}
+                </div>
+
+                <div class="grid grid-2" style="margin-top:24px">
+                    <div class="chart-container">
+                        <div class="chart-header"><span class="chart-title">Evolução de Emendas</span></div>
+                        <div style="height:260px"><canvas id="chartEvolucaoEmendas"></canvas></div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-header"><span class="chart-title">Top Estados</span></div>
+                        <div style="height:260px"><canvas id="chartTopEstados"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>`;
+}
+
+/* ============ EXECUTIVO ============ */
+function renderExecutivo() {
+    const lista = safeArray(RadarData.politicos).filter(p =>
+        String(p.cargo || '').toLowerCase().includes('prefeit') ||
+        String(p.cargo || '').toLowerCase().includes('governador') ||
+        String(p.cargo || '').toLowerCase().includes('presidente')
+    );
+
+    return `
+    <div class="page-transition">
+        <div class="page-hero">
+            <div class="page-hero-container">
+                <div class="page-hero-label"><i class="fas fa-building-columns"></i> EXECUTIVO</div>
+                <h1 class="page-hero-title">Painel do Executivo</h1>
+                <p class="page-hero-subtitle">Prefeitos, governadores e presidência</p>
+            </div>
+        </div>
+
+        <section class="section">
+            <div class="section-container">
+                <div class="grid grid-4">
+                    ${lista.length ? lista.map(p => renderPoliticoCard(p)).join('') : renderEmptyState('Nenhum registro do Executivo')}
+                </div>
+
+                <div class="chart-container" style="margin-top:24px">
+                    <div class="chart-header"><span class="chart-title">Execução Orçamentária Federal</span></div>
+                    <div style="height:300px"><canvas id="chartExecOrcFed"></canvas></div>
+                </div>
+            </div>
+        </section>
+    </div>`;
+}
+
+/* ============ STF ============ */
+function renderSTF() {
+    const ministros = safeArray(RadarData.stf || RadarData.ministros || []);
+
+    return `
+    <div class="page-transition">
+        <div class="page-hero">
+            <div class="page-hero-container">
+                <div class="page-hero-label"><i class="fas fa-gavel"></i> STF</div>
+                <h1 class="page-hero-title">Judiciário / STF</h1>
+                <p class="page-hero-subtitle">Sessões, produtividade e participação</p>
+            </div>
+        </div>
+
+        <section class="section">
+            <div class="section-container">
+                <div class="grid grid-4">
+                    ${ministros.length
+                        ? ministros.map(m => `
+                            <div class="card">
+                                <div style="font-weight:800;margin-bottom:8px">${safeText(m.nome, 'Ministro')}</div>
+                                <div style="font-size:13px;color:var(--text-muted)">Sessões: ${safeText(m.sessoes, '-')}</div>
+                                <div style="font-size:13px;color:var(--text-muted)">Votos: ${safeText(m.votos, '-')}</div>
+                            </div>
+                        `).join('')
+                        : renderEmptyState('Dados do STF não disponíveis')
+                    }
+                </div>
+
+                <div class="grid grid-2" style="margin-top:24px">
+                    <div class="chart-container">
+                        <div class="chart-header"><span class="chart-title">Produtividade</span></div>
+                        <div style="height:260px"><canvas id="chartSTFProd"></canvas></div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-header"><span class="chart-title">Participação</span></div>
+                        <div style="height:260px"><canvas id="chartSTFPart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>`;
+}
+
+/* ============ METODOLOGIA ============ */
+function renderMetodologia() {
+    return `
+    <section class="section">
+        <div class="section-container">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title"><i class="fas fa-flask"></i> Metodologia</h2>
+                    <p class="section-subtitle">Como os dados são organizados e apresentados</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <p>O RADAR PÚBLICO consolida dados públicos de agentes, emendas e execução orçamentária em uma interface única.</p>
+                <p>Os indicadores combinam volume de recursos, presença, projetos, execução e cobertura territorial.</p>
+                <p>Esta versão usa base demonstrativa para apresentação do sistema.</p>
+            </div>
+        </div>
+    </section>`;
+}
+
+/* ============ FONTES ============ */
+function renderFontes() {
+    return `
+    <section class="section">
+        <div class="section-container">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title"><i class="fas fa-database"></i> Fontes dos Dados</h2>
+                    <p class="section-subtitle">Principais bases públicas utilizadas</p>
+                </div>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3 style="margin-bottom:10px">Fontes Institucionais</h3>
+                    <ul style="padding-left:18px;line-height:1.8">
+                        <li>Portal da Transparência</li>
+                        <li>Câmara dos Deputados</li>
+                        <li>Senado Federal</li>
+                        <li>TSE</li>
+                        <li>TransferênciaGov</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom:10px">Observações</h3>
+                    <p>Os dados exibidos nesta versão podem conter valores simulados para demonstração visual do sistema.</p>
+                </div>
+            </div>
+        </div>
+    </section>`;
 }
