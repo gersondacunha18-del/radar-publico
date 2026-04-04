@@ -443,3 +443,77 @@ function renderEvolucaoEmendasChart(canvasId) {
         }
     }));
 }
+/* ============================================================
+   FALLBACKS DE GRÁFICOS
+   Evita quebrar a navegação quando algum gráfico não existir
+   ============================================================ */
+
+function ensureChartFallback(canvasId, message = 'Gráfico em preparação') {
+    const el = document.getElementById(canvasId);
+    if (!el) return false;
+
+    const parent = el.parentElement;
+    if (parent) {
+        parent.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:220px;color:var(--text-muted);text-align:center;padding:20px">
+                <div>
+                    <i class="fas fa-chart-bar" style="font-size:32px;display:block;margin-bottom:10px;opacity:.4"></i>
+                    <div>${message}</div>
+                </div>
+            </div>
+        `;
+    }
+    return true;
+}
+
+if (typeof renderExecucaoGeralChart !== 'function') {
+    function renderExecucaoGeralChart(canvasId) { ensureChartFallback(canvasId); }
+}
+
+if (typeof renderRegiaoChart !== 'function') {
+    function renderRegiaoChart(canvasId) { ensureChartFallback(canvasId); }
+}
+
+if (typeof renderEmendasAnoChart !== 'function') {
+    function renderEmendasAnoChart(canvasId) { ensureChartFallback(canvasId); }
+}
+
+if (typeof renderAreaChart !== 'function') {
+    function renderAreaChart(canvasId) { ensureChartFallback(canvasId); }
+}
+
+if (typeof renderPresencaChart !== 'function') {
+    function renderPresencaChart(canvasId) { ensureChartFallback(canvasId); }
+}
+
+if (typeof renderNotaRadarChart !== 'function') {
+    function renderNotaRadarChart(canvasId) { ensureChartFallback(canvasId); }
+}
+
+if (typeof renderOrcamentoChart !== 'function') {
+    function renderOrcamentoChart(canvasId) { ensureChartFallback(canvasId); }
+}
+
+if (typeof renderEvolucaoEmendasChart !== 'function') {
+    function renderEvolucaoEmendasChart(canvasId) { ensureChartFallback(canvasId); }
+}
+
+if (typeof renderTopEstadosChart !== 'function') {
+    function renderTopEstadosChart(canvasId) { ensureChartFallback(canvasId); }
+}
+
+if (typeof renderSTFProdutividadeChart !== 'function') {
+    function renderSTFProdutividadeChart(canvasId) { ensureChartFallback(canvasId); }
+}
+
+if (typeof renderSTFParticipacaoChart !== 'function') {
+    function renderSTFParticipacaoChart(canvasId) { ensureChartFallback(canvasId); }
+}
+
+if (typeof renderEmendaExecucaoChart !== 'function') {
+    function renderEmendaExecucaoChart(canvasId) { ensureChartFallback(canvasId); }
+}
+
+if (typeof renderComparadorChart !== 'function') {
+    function renderComparadorChart(canvasId) { ensureChartFallback(canvasId); }
+}
