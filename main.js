@@ -468,3 +468,8 @@ window.addEventListener('hashchange', function() {
         navigateTo(page, params);
     }
 });
+// Expor funções globais para botões do HTML
+window.navigateTo = navigateTo;
+window.closeModal = closeModal;
+window.openModal = openModal;
+window.showToast = showToast;
