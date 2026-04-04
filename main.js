@@ -628,7 +628,11 @@ function initKeyboard() {
 }
 
 /* ============ INICIALIZAÇÃO ============ */
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
+    if (typeof loadRadarData === 'function') {
+        await loadRadarData();
+    }
+
     initMobileMenu();
     initNavSearch();
     initNavbarScroll();
