@@ -675,3 +675,16 @@ window.switchTab = switchTab;
 window.closeModal = closeModal;
 window.openModal = openModal;
 window.showToast = showToast;
+
+document.addEventListener("DOMContentLoaded", async () => {
+    console.log("🚀 Iniciando Radar...");
+
+    const data = await loadRadarData();
+
+    console.log("📊 Dados carregados:", data);
+
+    // TESTE VISUAL (só pra ver se funcionou)
+    if (data.politicos.length > 0) {
+        document.querySelectorAll(".stat-card")[0].innerText = data.politicos.length;
+    }
+});
