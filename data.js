@@ -46,14 +46,14 @@ async function loadRadarData() {
         stats_gerais,
         execucao_anual
     ] = await Promise.all([
-        fetchJson('./politicos.json', []),
-        fetchJson('./stf.json', []),
-        fetchJson('./emendas.json', []),
-        fetchJson('./estados.json', []),
-        fetchJson('./cidades_top.json', []),
-        fetchJson('./regioes.json', []),
-        fetchJson('./stats_gerais.json', {}),
-        fetchJson('./execucao_anual.json', {})
+        fetchJson('/politicos.json', []),
+        fetchJson('/stf.json', []),
+        fetchJson('/emendas.json', []),
+        fetchJson('/estados.json', []),
+        fetchJson('/cidades_top.json', []),
+        fetchJson('/regioes.json', []),
+        fetchJson('/stats_gerais.json', {}),
+        fetchJson('/execucao_anual.json', {})
     ]);
 
     RadarData.politicos = safeArray(politicos);
@@ -64,6 +64,17 @@ async function loadRadarData() {
     RadarData.regioes = safeArray(regioes);
     RadarData.stats_gerais = safeObject(stats_gerais);
     RadarData.execucao_anual = safeObject(execucao_anual);
+
+    console.log('Radar carregado:', {
+        politicos: RadarData.politicos.length,
+        ministrosSTF: RadarData.ministrosSTF.length,
+        emendas: RadarData.emendas.length,
+        estados: RadarData.estados.length,
+        cidades_top: RadarData.cidades_top.length,
+        regioes: RadarData.regioes.length,
+        stats_gerais: RadarData.stats_gerais,
+        execucao_anual: RadarData.execucao_anual
+    });
 
     return RadarData;
 }
