@@ -14,5 +14,37 @@
     "situacao": "Em Execução",
     "situacao_cor": "blue",
     "percentual_execucao": 35
+  },
+  {
+    "id": 2,
+    "autor_id": 2,
+    "autor": "Maria Souza",
+    "partido": "PT",
+    "uf": "RJ",
+    "municipio": "Rio de Janeiro",
+    "estado": "RJ",
+    "objeto": "Aquisição de equipamentos escolares",
+    "tipo": "Educação",
+    "valor_indicado": 900000,
+    "valor_pago": 900000,
+    "situacao": "Concluída",
+    "situacao_cor": "green",
+    "percentual_execucao": 100
+  },
+  {
+    "id": 3,
+    "autor_id": 3,
+    "autor": "Carlos Lima",
+    "partido": "MDB",
+    "uf": "MG",
+    "municipio": "Belo Horizonte",
+    "estado": "MG",
+    "objeto": "Pavimentação de vias urbanas",
+    "tipo": "Infraestrutura",
+    "valor_indicado": 2200000,
+    "valor_pago": 200000,
+    "situacao": "Paralisada",
+    "situacao_cor": "red",
+    "percentual_execucao": 9
   }
 ]
