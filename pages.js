@@ -176,23 +176,24 @@ function renderPoliticoDetalhe(id) {
                             </thead>
                             <tbody>
                                 ${emendas.length ? emendas.map(e => `
-                                    <tr>
-                                        <td>${safeText(e.id, "-")}</td>
-                                        <td>${safeText(e.objeto, "-")}</td>
-                                        <td>${safeText(e.municipio, "-")} / ${safeText(e.estado, "-")}</td>
-                                        <td>${formatCurrency(e.valor_indicado || 0)}</td>
-                                        <td>
-                                            <span class="badge ${getStatusBadge(e.situacao)}">
-                                                ${safeText(e.situacao, "-")}
-                                            </span>
-                                        </td>
-                                        <td>${safeText(e.percentual_execucao, 0)}%</td>
-                                    </tr>
-                                `).join("") : `
-                                    <tr>
-                                        <td colspan="6" style="text-align:center;color:var(--text-muted)">Nenhuma emenda encontrada para este político.</td>
-                                    </tr>
-                                `}
+<tr>
+    <td>${safeText(e.id)}</td>
+    <td>${safeText(e.autor_id)}</td>
+    <td>${safeText(e.estado)}</td>
+    <td>${formatCurrency(e.valor)}</td>
+    <td>
+        <span class="${getStatusBadge(e.status)}">
+            ${safeText(e.status)}
+        </span>
+    </td>
+</tr>
+`).join('') : `
+<tr>
+    <td colspan="5" style="text-align:center; padding:20px;">
+        Nenhuma emenda encontrada
+    </td>
+</tr>
+`}
                             </tbody>
                         </table>
                     </div>
@@ -200,7 +201,7 @@ function renderPoliticoDetalhe(id) {
            </section>
     </div>
     `;
-
+}
 
 function renderInfoGrid(items = []) {
     return `
