@@ -200,7 +200,7 @@ function renderPoliticoDetalhe(id) {
            </section>
     </div>
     `;
-}
+
 
 function renderInfoGrid(items = []) {
     return `
