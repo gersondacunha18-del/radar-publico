@@ -64,7 +64,6 @@ function renderPoliticoCard(p) {
     `;
 }
 
-
 function renderInfoGrid(items = []) {
     return `
     <div class="info-grid">
