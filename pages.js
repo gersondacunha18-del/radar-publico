@@ -197,8 +197,8 @@ function renderPoliticoDetalhe(id) {
                         </table>
                     </div>
                 </div>
-            </section>
-        </div>
+           </section>
+    </div>
     `;
 }
 
