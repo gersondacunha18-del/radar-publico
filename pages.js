@@ -3,83 +3,67 @@
    ============================================================ */
 
 /* ============ HELPERS ============ */
-function safeArray(arr) {
-    return Array.isArray(arr) ? arr : [];
-}
-
-function safeText(value, fallback = '-') {
-    return value !== undefined && value !== null && value !== '' ? value : fallback;
-}
-
-function getStatusBadge(status) {
-    if (!status) return 'badge-gray';
-    const s = String(status).toLowerCase();
-    if (s.includes('concl')) return 'badge-green';
-    if (s.includes('exec') || s.includes('andamento')) return 'badge-blue';
-    if (s.includes('paralis') || s.includes('cancel')) return 'badge-red';
-    if (s.includes('empenh') || s.includes('pend')) return 'badge-orange';
-    return 'badge-gray';
-}
-
-function getPoliticoById(id) {
-    return safeArray(RadarData.politicos).find(p => String(p.id) === String(id)) || null;
-}
-
-function getEmendaById(id) {
-    return safeArray(RadarData.emendas).find(e => String(e.id) === String(id)) || null;
-}
-
 function renderPoliticoCard(p) {
+    const ranking = safeText(p.ranking, "-");
+    const nome = safeText(p.nome, "Sem nome");
+    const cargo = safeText(p.cargo, "Cargo não informado");
+    const partido = safeText(p.partido, "-");
+    const estado = safeText(p.estado, "-");
+    const foto = safeText(p.foto, "");
+    const avaliacao = Number(p.avaliacao || 0).toFixed(1);
+    const valorTotal = formatCurrency(p.valor_total || 0);
+    const municipios = formatNumber(p.municipios_atendidos || 0);
+    const execucao = Number(p.taxa_execucao || 0);
+
+    let medalha = "🏅";
+    if (ranking === 1) medalha = "🥇";
+    if (ranking === 2) medalha = "🥈";
+    if (ranking === 3) medalha = "🥉";
+
     return `
-    <div class="politician-card" onclick="navigateTo('perfil', '${p.id}')">
-        <div class="score-badge score-${(p.nota_letra || 'C').toLowerCase()}">${safeText(p.nota, '-')}</div>
-        <div class="politician-avatar">${safeText(p.foto_inicial, '??')}</div>
-        <div class="politician-name">${safeText(p.nome, 'Sem nome')}</div>
-        <div class="politician-role">${safeText(p.cargo, 'Cargo não informado')}</div>
-        <div class="politician-party">${safeText(p.partido, '-')} · ${safeText(p.uf, '-')}</div>
-        <div class="politician-stats">
-            <div class="pol-stat-item">
-                <div class="pol-stat-value">${p.valor_total ? formatCurrency(p.valor_total) : '-'}</div>
-                <div class="pol-stat-label">Recursos</div>
+        <div class="politician-card" onclick="navigateTo('politico-detalhe', '${p.id}')">
+            <div class="score-badge">
+                ${medalha} #${ranking}
             </div>
-            <div class="pol-stat-item">
-                <div class="pol-stat-value">${safeText(p.cidades_atendidas, '-')}</div>
-                <div class="pol-stat-label">Cidades</div>
+
+            <div class="politician-avatar">
+                ${foto ? `<img src="${foto}" alt="${nome}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : nome.charAt(0)}
+            </div>
+
+            <div class="politician-name">${nome}</div>
+            <div class="politician-role">${cargo}</div>
+            <div class="politician-party">${partido} · ${estado}</div>
+
+            <div class="politician-stats">
+                <div class="pol-stat-item">
+                    <div class="pol-stat-value">${valorTotal}</div>
+                    <div class="pol-stat-label">Recursos</div>
+                </div>
+
+                <div class="pol-stat-item">
+                    <div class="pol-stat-value">${municipios}</div>
+                    <div class="pol-stat-label">Cidades</div>
+                </div>
+
+                <div class="pol-stat-item">
+                    <div class="pol-stat-value">${avaliacao} ⭐</div>
+                    <div class="pol-stat-label">Avaliação</div>
+                </div>
+            </div>
+
+            <div style="margin-top:12px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;color:var(--text-muted)">
+                    <span>Execução</span>
+                    <span>${execucao}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill ${execucao === 100 ? 'success' : execucao < 30 ? 'warning' : ''}" style="width:${execucao}%"></div>
+                </div>
             </div>
         </div>
-    </div>`;
+    `;
 }
 
-function renderComparadorCard(p) {
-    return `
-    <div class="card">
-        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
-            <div class="politician-avatar" style="margin:0">${safeText(p.foto_inicial, '??')}</div>
-            <div>
-                <div style="font-weight:800">${safeText(p.nome, 'Sem nome')}</div>
-                <div style="font-size:12px;color:var(--text-muted)">${safeText(p.cargo, '-')} · ${safeText(p.partido, '-')} · ${safeText(p.uf, '-')}</div>
-            </div>
-        </div>
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">Nota</div>
-                <div class="info-value">${safeText(p.nota, '-')}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Presença</div>
-                <div class="info-value">${safeText(p.presenca, '-')}%</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Projetos</div>
-                <div class="info-value">${safeText(p.projetos, '-')}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Recursos</div>
-                <div class="info-value">${p.valor_total ? formatCurrency(p.valor_total) : '-'}</div>
-            </div>
-        </div>
-    </div>`;
-}
 
 function renderInfoGrid(items = []) {
     return `
