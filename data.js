@@ -65,6 +65,8 @@ async function loadRadarData() {
     RadarData.stats_gerais = safeObject(stats_gerais);
     RadarData.execucao_anual = safeObject(execucao_anual);
 
+    gerarRankingPoliticos();
+    
     console.log('Radar carregado:', {
         politicos: RadarData.politicos.length,
         ministrosSTF: RadarData.ministrosSTF.length,
@@ -125,4 +127,34 @@ function getEmendasByAutor(autor_id) {
 
 function getEmendasByEstado(uf) {
     return RadarData.emendas.filter(e => String(e.estado) === String(uf));
+}
+function calcularScorePolitico(politico) {
+    const valor = Number(politico.valor_total || 0);
+    const execucao = Number(politico.taxa_execucao || 0);
+    const municipios = Number(politico.municipios_atendidos || 0);
+    const emendas = Number(politico.total_emendas || 0);
+    const avaliacao = Number(politico.avaliacao || 0);
+
+    return (
+        valor * 0.000001 +
+        execucao * 2 +
+        municipios * 5 +
+        emendas * 3 +
+        avaliacao * 20
+    );
+}
+
+function gerarRankingPoliticos() {
+    RadarData.politicos = safeArray(RadarData.politicos)
+        .map((p) => ({
+            ...p,
+            score: calcularScorePolitico(p)
+        }))
+        .sort((a, b) => b.score - a.score)
+        .map((p, index) => ({
+            ...p,
+            ranking: index + 1
+        }));
+
+    return RadarData.politicos;
 }

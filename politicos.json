@@ -1,5 +1,72 @@
 [
-  { "id": 1, "nome": "João Silva", "partido": "PL", "estado": "SP" },
-  { "id": 2, "nome": "Maria Souza", "partido": "PT", "estado": "RJ" },
-  { "id": 3, "nome": "Carlos Lima", "partido": "MDB", "estado": "MG" }
+  {
+    "id": 1,
+    "nome": "João Silva",
+    "partido": "PL",
+    "estado": "SP",
+    "cargo": "Deputado Federal",
+    "foto": "https://randomuser.me/api/portraits/men/32.jpg",
+    "avaliacao": 4.5,
+    "total_emendas": 12,
+    "valor_total": 4500000,
+    "municipios_atendidos": 8,
+    "taxa_execucao": 78,
+    "ranking": 1
+  },
+  {
+    "id": 2,
+    "nome": "Maria Souza",
+    "partido": "PT",
+    "estado": "RJ",
+    "cargo": "Senadora",
+    "foto": "https://randomuser.me/api/portraits/women/44.jpg",
+    "avaliacao": 4.2,
+    "total_emendas": 9,
+    "valor_total": 3200000,
+    "municipios_atendidos": 6,
+    "taxa_execucao": 65,
+    "ranking": 2
+  },
+  {
+    "id": 3,
+    "nome": "Carlos Lima",
+    "partido": "MDB",
+    "estado": "MG",
+    "cargo": "Deputado Estadual",
+    "foto": "https://randomuser.me/api/portraits/men/65.jpg",
+    "avaliacao": 3.8,
+    "total_emendas": 7,
+    "valor_total": 2100000,
+    "municipios_atendidos": 5,
+    "taxa_execucao": 52,
+    "ranking": 3
+  },
+  {
+    "id": 4,
+    "nome": "Fernanda Alves",
+    "partido": "PSDB",
+    "estado": "RS",
+    "cargo": "Prefeita",
+    "foto": "https://randomuser.me/api/portraits/women/68.jpg",
+    "avaliacao": 4.7,
+    "total_emendas": 15,
+    "valor_total": 6800000,
+    "municipios_atendidos": 10,
+    "taxa_execucao": 88,
+    "ranking": 4
+  },
+  {
+    "id": 5,
+    "nome": "Ricardo Mendes",
+    "partido": "UNIÃO",
+    "estado": "BA",
+    "cargo": "Deputado Federal",
+    "foto": "https://randomuser.me/api/portraits/men/22.jpg",
+    "avaliacao": 3.5,
+    "total_emendas": 6,
+    "valor_total": 1800000,
+    "municipios_atendidos": 4,
+    "taxa_execucao": 40,
+    "ranking": 5
+  }
 ]
