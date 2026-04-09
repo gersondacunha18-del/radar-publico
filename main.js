@@ -692,7 +692,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     console.log("📊 Dados carregados:", data);
 
-    // TESTE VISUAL (só pra ver se funcionou)
     if (data.politicos.length > 0) {
         document.querySelectorAll(".stat-card")[0].innerText = data.politicos.length;
     }
