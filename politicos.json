@@ -1,0 +1,5 @@
+[
+  { "id": 1, "nome": "João Silva", "partido": "PL", "estado": "SP" },
+  { "id": 2, "nome": "Maria Souza", "partido": "PT", "estado": "RJ" },
+  { "id": 3, "nome": "Carlos Lima", "partido": "MDB", "estado": "MG" }
+]
