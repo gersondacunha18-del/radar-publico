@@ -116,9 +116,16 @@ function renderPage(page, params = null) {
             html = typeof renderFontes === 'function' ? renderFontes() : '<section class="section"><div class="section-container"><h2>Fontes em preparação</h2></div></section>';
             break;
 
+            case 'politico-detalhe':
+    html = typeof renderPoliticoDetalhe === 'function'
+        ? renderPoliticoDetalhe(params)
+        : '';
+    break;
+
         default:
             html = typeof renderHome === 'function' ? renderHome() : '<section class="section"><div class="section-container"><h2>Home</h2></div></section>';
             break;
+            
     }
 
     main.innerHTML = html;
