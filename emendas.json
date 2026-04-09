@@ -2,8 +2,17 @@
   {
     "id": 1,
     "autor_id": 1,
+    "autor": "João Silva",
+    "partido": "PL",
+    "uf": "SP",
+    "municipio": "São Paulo",
     "estado": "SP",
-    "valor": 1500000,
-    "status": "Em Execução"
+    "objeto": "Reforma de unidade de saúde",
+    "tipo": "Saúde",
+    "valor_indicado": 1500000,
+    "valor_pago": 500000,
+    "situacao": "Em Execução",
+    "situacao_cor": "blue",
+    "percentual_execucao": 35
   }
 ]

@@ -1,8 +1,9 @@
 {
-  "agentes_monitorados": 3,
-  "emendas_2024": 1,
-  "volume_total_2024": 1500000,
-  "taxa_execucao": 35,
+  "total_politicos_monitorados": 3,
+  "total_emendas_2024": 1,
+  "valor_total_emendas": 1500000,
+  "percentual_execucao": 35,
   "municipios_atendidos": 10,
-  "obras_ativas": 3
+  "obras_ativas": 3,
+  "data_atualizacao": "09/04/2026"
 }
