@@ -64,6 +64,144 @@ function renderPoliticoCard(p) {
     `;
 }
 
+function renderPoliticoDetalhe(id) {
+    console.log('renderPoliticoDetalhe recebeu:', id);
+
+    const politico = getPoliticoById(id);
+
+    if (!politico) {
+        return `
+            <div class="page-transition">
+                <section class="section">
+                    <div class="section-container">
+                        <div class="empty-state">
+                            <h2>Político não encontrado</h2>
+                            <p class="text-muted">Não foi possível localizar esse registro.</p>
+                            <button class="btn btn-primary" onclick="navigateTo('home')">Voltar</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        `;
+    }
+
+    // resto da função...
+}
+
+    const emendas = getEmendasByAutor(politico.id);
+    const valorTotalEmendas = emendas.reduce((acc, e) => acc + Number(e.valor_indicado || 0), 0);
+
+    let medalha = "🏅";
+    if (politico.ranking === 1) medalha = "🥇";
+    if (politico.ranking === 2) medalha = "🥈";
+    if (politico.ranking === 3) medalha = "🥉";
+
+    return `
+        <div class="page-transition">
+            <section class="section">
+                <div class="section-container">
+                    <button class="btn btn-ghost btn-sm" onclick="navigateTo('home')" style="margin-bottom:20px">
+                        ← Voltar
+                    </button>
+
+                    <div class="detail-card">
+                        <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+                            <div class="politician-avatar" style="width:96px;height:96px;font-size:32px">
+                                ${politico.foto
+                                    ? `<img src="${politico.foto}" alt="${safeText(politico.nome)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+                                    : safeText(politico.nome, "P").charAt(0)}
+                            </div>
+
+                            <div style="flex:1">
+                                <div class="badge badge-blue" style="margin-bottom:10px">${medalha} Ranking #${politico.ranking || "-"}</div>
+                                <h1 style="margin:0 0 8px 0">${safeText(politico.nome, "Sem nome")}</h1>
+                                <p style="margin:0 0 6px 0;color:var(--text-secondary)">${safeText(politico.cargo, "Cargo não informado")}</p>
+                                <p style="margin:0;color:var(--text-muted)">${safeText(politico.partido, "-")} · ${safeText(politico.estado, "-")}</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-4" style="margin-top:24px">
+                            <div class="hero-stat">
+                                <div class="stat-num">${Number(politico.avaliacao || 0).toFixed(1)} ⭐</div>
+                                <div class="stat-label">Avaliação</div>
+                            </div>
+                            <div class="hero-stat">
+                                <div class="stat-num">${formatCurrency(politico.valor_total || 0)}</div>
+                                <div class="stat-label">Valor Total</div>
+                            </div>
+                            <div class="hero-stat">
+                                <div class="stat-num">${formatNumber(politico.municipios_atendidos || 0)}</div>
+                                <div class="stat-label">Municípios Atendidos</div>
+                            </div>
+                            <div class="hero-stat">
+                                <div class="stat-num">${formatNumber(politico.taxa_execucao || 0)}%</div>
+                                <div class="stat-label">Taxa de Execução</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-header" style="margin-top:32px">
+                        <div>
+                            <h2 class="section-title"><i class="fas fa-file-invoice-dollar"></i> Emendas do Político</h2>
+                            <p class="section-subtitle">Resumo das movimentações vinculadas a este agente</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-3">
+                        <div class="hero-stat">
+                            <div class="stat-num">${formatNumber(emendas.length)}</div>
+                            <div class="stat-label">Total de Emendas</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="stat-num">${formatCurrency(valorTotalEmendas)}</div>
+                            <div class="stat-label">Valor Indicado</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="stat-num">${politico.score ? politico.score.toFixed(1) : "-"}</div>
+                            <div class="stat-label">Score</div>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper" style="margin-top:24px">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>OBJETO</th>
+                                    <th>MUNICÍPIO</th>
+                                    <th>VALOR</th>
+                                    <th>SITUAÇÃO</th>
+                                    <th>EXECUÇÃO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${emendas.length ? emendas.map(e => `
+                                    <tr>
+                                        <td>${safeText(e.id, "-")}</td>
+                                        <td>${safeText(e.objeto, "-")}</td>
+                                        <td>${safeText(e.municipio, "-")} / ${safeText(e.estado, "-")}</td>
+                                        <td>${formatCurrency(e.valor_indicado || 0)}</td>
+                                        <td>
+                                            <span class="badge ${getStatusBadge(e.situacao)}">
+                                                ${safeText(e.situacao, "-")}
+                                            </span>
+                                        </td>
+                                        <td>${safeText(e.percentual_execucao, 0)}%</td>
+                                    </tr>
+                                `).join("") : `
+                                    <tr>
+                                        <td colspan="6" style="text-align:center;color:var(--text-muted)">Nenhuma emenda encontrada para este político.</td>
+                                    </tr>
+                                `}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    `;
+}
+
 function renderInfoGrid(items = []) {
     return `
     <div class="info-grid">

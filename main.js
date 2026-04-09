@@ -117,9 +117,11 @@ function renderPage(page, params = null) {
             break;
 
             case 'politico-detalhe':
+    console.log('rota politico-detalhe', params, typeof renderPoliticoDetalhe);
+
     html = typeof renderPoliticoDetalhe === 'function'
         ? renderPoliticoDetalhe(params)
-        : '';
+        : '<div style="padding:40px;color:white">Função renderPoliticoDetalhe não encontrada</div>';
     break;
 
         default:
